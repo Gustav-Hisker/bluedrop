@@ -1,10 +1,13 @@
-from bless import BlessServer
-import asyncio
+import socket
 
-from bless.backends.characteristic import BlessGATTCharacteristic
+bluetoothMACAddr = ""
 
-server = BlessServer(name="Test-BLE-Server", loop=asyncio.get_event_loop())
-server.read_request_func = lambda characteristic, **kwargs: print(characteristic)
-server.write_request_func = lambda characteristic, value, **kwargs: print(characteristic, value)
+server = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+server.bind((bluetoothMACAddr, 4))
+server.listen(1)
 
-asyncio.run(server.start())
+connection, addr = server.accept()
+
+while True:
+    print(str(connection.recv(1024), "UTF-8"))
+

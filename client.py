@@ -1,12 +1,10 @@
-import asyncio
-from bleak import BleakScanner
+import socket
+
+serverMACAddr = ""
+
+client = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+client.connect((serverMACAddr, 4))
 
 
-async def main():
-    devices = await BleakScanner.discover()
-    print("-"*20+" BLE Scan "+"-"*20)
-    for d in devices:
-        print(d)
-
-
-asyncio.run(main())
+while True:
+    client.send(bytes(input(),"UTF-8"))
