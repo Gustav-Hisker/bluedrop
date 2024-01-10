@@ -14,7 +14,7 @@ def getBluetoothMAC():
 bluetoothMACAddr = getBluetoothMAC()
 
 server = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-server.bind((bluetoothMACAddr, 4))
+server.bind((bluetoothMACAddr, 5))
 server.listen(1)
 
 print("Started server on " + bluetoothMACAddr)
@@ -25,12 +25,14 @@ while True:
         initialMsg = str(connection.recv(1024), "UTF-8")
         if initialMsg.startswith("--"):
             filename, filesize = initialMsg.removeprefix("--").split("--")
+            connection.send(bytes(200))
             with open(filename, "wb") as f:
-                f.write(connection.recv(filesize))
+                f.write(connection.recv(int(filesize)))
             print("Recieved " + filename + " from " + addr[0])
         else:
             print("Messages from " + addr[0])
             while True:
                 print(connection.recv(1024))
-    except:
+    except OSError as err:
+        print(err)
         pass

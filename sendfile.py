@@ -7,9 +7,13 @@ def sendFile(mac, path: str):
     client = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
     client.connect((serverMACAddr, 4))
     client.send(bytes("--" + path.split("/")[-1] + "--" + str(getsize(path)), "UTF-8"))
+    response = client.recv(1024)
+    if int(response) != 200:
+        return False
     with open(path, "wb") as f:
         client.send(f.read())
     client.close()
+    return True
 
 
 if __name__ == "__main__":
