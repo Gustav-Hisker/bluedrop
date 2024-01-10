@@ -6,6 +6,7 @@ with open("Target-Addr") as f:
 client = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
 client.connect((serverMACAddr, 4))
 
-print("Text an den Server:")
-while True:
-    client.send(bytes(input(), "UTF-8"))
+print("Nachricht:")
+client.send(bytes(input(), "UTF-8"))
+
+client.close()
