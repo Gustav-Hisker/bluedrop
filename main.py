@@ -1,6 +1,7 @@
 import re
 import socket
 import subprocess
+import threading
 
 
 def getBluetoothMAC():
@@ -11,31 +12,52 @@ def getBluetoothMAC():
     return re.findall(regex, str(hciconfig))[0]
 
 
+class ConnectionHandleThread(threading.Thread):
+    def __init__(self, connection, addr):
+        super().__init__()
+        self.connection = connection
+        self.addr = addr
+
+
+    def run(self):
+        try:
+            initialMsg = str(self.connection.recv(1024), "UTF-8")
+            if initialMsg.startswith("--"):
+                filename, filesize = initialMsg.removeprefix("--").split("--")
+                with open(filename, "wb") as f:
+                    self.connection.send((200).to_bytes(1, "big"))
+                    data = self.connection.recv(int(filesize))
+                    print(data)
+                    f.write(data)
+                print("Recieved " + filename + " from " + self.addr[0])
+            else:
+                print("Message from " + self.addr[0] + ":")
+                print(initialMsg)
+                while True:
+                    print("Message from " + self.addr[0] + ":")
+                    print(str(self.connection.recv(1024)))
+        except OSError as err:
+            if err.errno == 104:
+                print(self.addr[0] + " disconnected")
+            else:
+                print(err)
+        
+
+
+
 bluetoothMACAddr = getBluetoothMAC()
 
 server = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
 server.bind((bluetoothMACAddr, 4))
-server.listen(1)
+server.listen(10)
 
 print("Started server on " + bluetoothMACAddr)
 
 while True:
     try:
         connection, addr = server.accept()
-        initialMsg = str(connection.recv(1024), "UTF-8")
-        if initialMsg.startswith("--"):
-            filename, filesize = initialMsg.removeprefix("--").split("--")
-            with open(filename, "wb") as f:
-                connection.send((200).to_bytes((200).bit_length(), "big"))
-                data = connection.recv(int(filesize))
-                print(data)
-                f.write(data)
-            print("Recieved " + filename + " from " + addr[0])
-        else:
-            print("Messages from " + addr[0])
-            print(initialMsg)
-            while True:
-                print(str(connection.recv(1024)))
+        handler = ConnectionHandleThread(connection, addr)
+        handler.start()
     except OSError as err:
         print(err)
         pass
