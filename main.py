@@ -25,14 +25,17 @@ while True:
         initialMsg = str(connection.recv(1024), "UTF-8")
         if initialMsg.startswith("--"):
             filename, filesize = initialMsg.removeprefix("--").split("--")
-            connection.send(int.to_bytes(200))
             with open(filename, "wb") as f:
-                f.write(connection.recv(int(filesize)))
+                connection.send((200).to_bytes((200).bit_length(), "big"))
+                data = connection.recv(int(filesize))
+                print(data)
+                f.write(data)
             print("Recieved " + filename + " from " + addr[0])
         else:
             print("Messages from " + addr[0])
+            print(initialMsg)
             while True:
-                print(connection.recv(1024))
+                print(str(connection.recv(1024)))
     except OSError as err:
         print(err)
         pass
