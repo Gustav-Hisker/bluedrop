@@ -10,7 +10,7 @@ def sendFile(mac, path: str):
     response = client.recv(1024)
     if int.from_bytes(response, "big") != 200:
         return False
-    with open(path, "wb") as f:
+    with open(path, "rb") as f:
         client.send(f.read())
     client.close()
     return True
