@@ -19,8 +19,18 @@ server.listen(1)
 
 print("Started server on " + bluetoothMACAddr)
 
-connection, addr = server.accept()
-
 while True:
-    print(str(connection.recv(1024), "UTF-8"))
-
+    try:
+        connection, addr = server.accept()
+        initialMsg = str(connection.recv(1024), "UTF-8")
+        if initialMsg.startswith("--"):
+            filename, filesize = initialMsg.removeprefix("--").split("--")
+            with open(filename, "wb") as f:
+                f.write(connection.recv(filesize))
+            print("Recieved " + filename + " from " + addr[0])
+        else:
+            print("Messages from " + addr[0])
+            while True:
+                print(connection.recv(1024))
+    except:
+        pass

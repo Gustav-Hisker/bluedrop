@@ -1,6 +1,7 @@
 import socket
 
-serverMACAddr = "CC:5E:F8:D7:7A:3C"
+with open("Target-Addr") as f:
+    serverMACAddr = f.read().strip()
 
 client = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
 client.connect((serverMACAddr, 4))
