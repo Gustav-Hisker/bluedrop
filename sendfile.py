@@ -8,7 +8,7 @@ def sendFile(mac, path: str):
     client.connect((serverMACAddr, 4))
     client.send(bytes("--" + path.split("/")[-1] + "--" + str(getsize(path)), "UTF-8"))
     response = client.recv(1024)
-    if int.from_bytes(response) != 200:
+    if int.from_bytes(response, "big") != 200:
         return False
     with open(path, "wb") as f:
         client.send(f.read())
