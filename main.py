@@ -34,8 +34,9 @@ class ConnectionHandleThread(threading.Thread):
                 print("Message from " + self.addr[0] + ":")
                 print(initialMsg)
                 while True:
+                    msg = str(self.connection.recv(1024), "UTF-8")
                     print("Message from " + self.addr[0] + ":")
-                    print(str(self.connection.recv(1024)))
+                    print(msg)
         except OSError as err:
             if err.errno == 104:
                 print(self.addr[0] + " disconnected")
