@@ -24,17 +24,13 @@ class ConnectionHandleThread(threading.Thread):
             initialMsg = str(self.connection.recv(1024), "UTF-8")
             if initialMsg.startswith("--"):
                 filename, filesize = initialMsg.removeprefix("--").split("--")
+                print("Recieved " + filename + " from " + self.addr[0])
                 with open(filename, "wb") as f:
                     self.connection.send((200).to_bytes(1, "big"))
                     data = self.connection.recv(1024)
                     while data:
                         f.write(data)
-                        try:
-                            data = self.connection.recv(1024)
-                        except OSError as err:
-                            if err.errno != 104:
-                                print(err)
-                print("Recieved " + filename + " from " + self.addr[0])
+                        data = self.connection.recv(1024)
             else:
                 print("Message from " + self.addr[0] + ":")
                 print(initialMsg)
