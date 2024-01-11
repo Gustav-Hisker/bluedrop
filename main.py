@@ -29,7 +29,11 @@ class ConnectionHandleThread(threading.Thread):
                     data = self.connection.recv(1024)
                     while data:
                         f.write(data)
-                        data = self.connection.recv(1024)
+                        try:
+                            data = self.connection.recv(1024)
+                        except OSError as err:
+                            if err.errno != 104:
+                                print(err)
                 print("Recieved " + filename + " from " + self.addr[0])
             else:
                 print("Message from " + self.addr[0] + ":")
