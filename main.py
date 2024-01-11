@@ -26,9 +26,10 @@ class ConnectionHandleThread(threading.Thread):
                 filename, filesize = initialMsg.removeprefix("--").split("--")
                 with open(filename, "wb") as f:
                     self.connection.send((200).to_bytes(1, "big"))
-                    data = self.connection.recv(int(filesize))
-                    print(data)
-                    f.write(data)
+                    data = self.connection.recv(1024)
+                    while data:
+                        f.write(data)
+                        data = self.connection.recv(1024)
                 print("Recieved " + filename + " from " + self.addr[0])
             else:
                 print("Message from " + self.addr[0] + ":")
