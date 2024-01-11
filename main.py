@@ -29,7 +29,6 @@ class ConnectionHandleThread(threading.Thread):
                 with open(filename, "wb") as f:
                     self.connection.send((200).to_bytes(1, "big"))
                     data = self.connection.recv(1024)
-                    time.sleep(2)
                     while data:
                         f.write(data)
                         data = self.connection.recv(1024)
