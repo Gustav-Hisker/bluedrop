@@ -43,6 +43,8 @@ class ConnectionHandleThread(threading.Thread):
                 print("Message" + ("s" if len(args) > 2 else "") + " from " + self.addr[0] + ":")
                 for msg in args[1:]:
                     print(msg)
+                connection.send(DONE)
+
 
         except OSError as err:
             if err.errno == 104:
