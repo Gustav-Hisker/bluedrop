@@ -3,17 +3,24 @@ import sys
 from os.path import getsize
 
 
+OK = bytes("OK", "UTF-8")
+DONE = bytes("DONE", "UTF-8")
+
+
 def sendFile(mac, path: str):
     client = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
     client.connect((serverMACAddr, 4))
-    client.send(bytes("--" + path.split("/")[-1] + "--" + str(getsize(path)), "UTF-8"))
-    response = client.recv(1024)
-    if int.from_bytes(response, "big") != 200:
-        return False
+    client.send(bytes("file " + path.split("/")[-1], "UTF-8"))
+    res = client.recv(1024)
+    if res != OK:
+        raise Exception("Return Code Invalid: " + str(res, "UTF-8"))
     with open(path, "rb") as f:
         client.send(f.read())
+
+    res = client.recv(1024)
+    if res != DONE:
+        raise Exception("Return Code Invalid: " + str(res, "UTF-8"))
     client.close()
-    return True
 
 
 if __name__ == "__main__":

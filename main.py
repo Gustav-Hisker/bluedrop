@@ -2,8 +2,9 @@ import re
 import socket
 import subprocess
 import threading
-import time
 
+OK = bytes("OK", "UTF-8")
+DONE = bytes("DONE", "UTF-8")
 
 def getBluetoothMAC():
     hciconfig = subprocess.run("hciconfig", stdout=subprocess.PIPE).stdout
@@ -22,30 +23,32 @@ class ConnectionHandleThread(threading.Thread):
 
     def run(self):
         try:
-            initialMsg = str(self.connection.recv(1024), "UTF-8")
-            if initialMsg.startswith("--"):
-                filename, filesize = initialMsg.removeprefix("--").split("--")
-                print("Recieved " + filename + " from " + self.addr[0])
+            args = str(self.connection.recv(1024), "UTF-8").split()
+            msgType = args[0]
+            if msgType == "file":
+                filename = args[1]
+
                 with open(filename, "wb") as f:
-                    self.connection.send((200).to_bytes(1, "big"))
+                    self.connection.send(OK)
+
                     data = self.connection.recv(1024)
                     while data:
                         f.write(data)
                         data = self.connection.recv(1024)
-            else:
-                print("Message from " + self.addr[0] + ":")
-                print(initialMsg)
-                while True:
-                    msg = str(self.connection.recv(1024), "UTF-8")
-                    print("Message from " + self.addr[0] + ":")
+
+                connection.send(DONE)
+                print("Recieved " + filename + " from " + self.addr[0])
+
+            elif msgType == "text":
+                print("Message" + ("s" if len(args) > 2 else "") + " from " + self.addr[0] + ":")
+                for msg in args[1:]:
                     print(msg)
+
         except OSError as err:
             if err.errno == 104:
                 print(self.addr[0] + " disconnected")
             else:
                 print(err)
-        
-
 
 
 bluetoothMACAddr = getBluetoothMAC()
