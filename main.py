@@ -20,7 +20,6 @@ class ConnectionHandleThread(threading.Thread):
         self.connection = connection
         self.addr = addr
 
-
     def run(self):
         try:
             args = str(self.connection.recv(1024), "UTF-8").split()
@@ -44,7 +43,6 @@ class ConnectionHandleThread(threading.Thread):
                 for msg in args[1:]:
                     print(msg)
                 connection.send(DONE)
-
 
         except OSError as err:
             if err.errno == 104:
