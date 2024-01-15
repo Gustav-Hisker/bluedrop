@@ -32,10 +32,9 @@ class ConnectionHandleThread(threading.Thread):
                 with open(filename, "wb") as f:
                     self.connection.send(OK)
 
-                    data = self.connection.recv(1024)
-                    for _ in range(filesize//1024):
-                        f.write(data)
+                    for _ in range(filesize//1024+1):
                         data = self.connection.recv(1024)
+                        f.write(data)
 
                 connection.send(DONE)
                 print("Recieved " + filename + " from " + self.addr[0])
