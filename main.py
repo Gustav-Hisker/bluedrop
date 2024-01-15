@@ -27,12 +27,13 @@ class ConnectionHandleThread(threading.Thread):
             msgType = args[0]
             if msgType == "file":
                 filename = args[1]
+                filesize = int(args[2])
 
                 with open(filename, "wb") as f:
                     self.connection.send(OK)
 
                     data = self.connection.recv(1024)
-                    while data:
+                    for _ in range(filesize//1024):
                         f.write(data)
                         data = self.connection.recv(1024)
 

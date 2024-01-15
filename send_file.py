@@ -10,7 +10,7 @@ DONE = bytes("DONE", "UTF-8")
 def sendFile(mac, path: str):
     client = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
     client.connect((serverMACAddr, 4))
-    client.send(bytes("file " + path.split("/")[-1], "UTF-8"))
+    client.send(bytes("file " + path.split("/")[-1], "UTF-8" + " " + str(getsize(path))))
     res = client.recv(1024)
     if res != OK:
         raise Exception("Return Code Invalid: " + str(res, "UTF-8"))
